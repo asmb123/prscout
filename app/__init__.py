@@ -1,0 +1,1 @@
+"""PRScout application package."""

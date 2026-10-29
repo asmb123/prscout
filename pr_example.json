@@ -1,0 +1,8 @@
+{
+    "repository": {
+        "full_name": "owner/repo"
+    },
+    "pull_request": {
+        "number": 4
+    }
+}

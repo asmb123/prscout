@@ -1,2 +1,11 @@
 .venv
+.env
+*.pyc
+__pycache__/
 Readme.md
+pr.json
+Dockerfile
+.github
+tests
+.agent-review.md
+.dockerignore

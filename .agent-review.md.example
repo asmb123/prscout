@@ -1,0 +1,11 @@
+# Comma-separated review goals and path filters.
+goals: Correctness, Security, Maintainability
+include: **/*
+exclude: vendor/**, generated/**
+command: ruff 120
+command: pytest 300
+max_files: 100
+max_diff_bytes: 200000
+max_findings: 20
+max_comments: 10
+checks_blocking: false
