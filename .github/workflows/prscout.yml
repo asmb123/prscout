@@ -1,0 +1,36 @@
+name: PRScout review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build reviewer image
+        run: docker build --tag prscout:ci .
+      - name: Review pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ vars.GROQ_MODEL || 'llama-3.3-70b-versatile' }}
+          GROQ_FALLBACK_MODEL: ${{ vars.GROQ_FALLBACK_MODEL || 'openai/gpt-oss-20b' }}
+        run: |
+          docker run --rm \
+            --env GITHUB_TOKEN \
+            --env GROQ_API_KEY \
+            --env GROQ_MODEL \
+            --env GROQ_FALLBACK_MODEL \
+            --env GITHUB_EVENT_PATH=/tmp/event.json \
+            --volume "$GITHUB_EVENT_PATH:/tmp/event.json:ro" \
+            --volume "$GITHUB_WORKSPACE:/workspace:ro" \
+            --workdir /workspace \
+            prscout:ci

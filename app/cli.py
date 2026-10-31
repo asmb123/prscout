@@ -13,8 +13,8 @@ if __package__ in (None, ""):
 
 from app.config import ConfigurationError, github_token, load_review_config
 from app.gith.client import PyGithubClient
+from app.graph import build_review_graph
 from app.llm import GroqReviewProvider
-from app.models import ReviewState
 
 
 def main() -> int:
@@ -33,8 +33,7 @@ def main() -> int:
     owner, name = repository.split("/", 1)
     client = PyGithubClient(github_token())
     pr = client.get_pull_request(owner, name, int(pull["number"]))
-    state = ReviewState(pr=pr, files=client.get_changed_files(pr))
-    from app.graph import review_pull_request
+    config = load_review_config(Path.cwd())
     primary = GroqReviewProvider()
     fallback_model = os.getenv("GROQ_FALLBACK_MODEL")
     fallback = (
@@ -42,11 +41,17 @@ def main() -> int:
         if fallback_model and fallback_model != primary.model
         else None
     )
-    result = review_pull_request(state, load_review_config(Path.cwd()), primary, fallback)
-    if result.error:
-        print(result.error)
+    graph = build_review_graph(
+        config,
+        primary,
+        fallback,
+        github=client,
+        working_directory=str(Path.cwd()),
+    )
+    result = graph.invoke({"pr": pr, "files": client.get_changed_files(pr)})
+    if result.get("error"):
+        print(result["error"], file=sys.stderr)
         return 1
-    client.publish_review(pr, result.summary, result.findings)
     return 0
 
 if __name__ == "__main__":

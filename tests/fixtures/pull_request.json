@@ -1,0 +1,26 @@
+{
+  "action": "opened",
+  "pull_request": {
+    "number": 1,
+    "title": "Test pull request",
+    "body": "Testing PRScout",
+    "user": {
+      "login": "test-user"
+    },
+    "head": {
+      "ref": "feature/test",
+      "sha": "abc123"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "def456"
+    }
+  },
+  "repository": {
+    "name": "mentoring",
+    "full_name": "cncf/mentoring",
+    "owner": {
+      "login": "cncf"
+    }
+  }
+}
