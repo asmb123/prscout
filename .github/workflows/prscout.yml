@@ -5,6 +5,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   pr-review:
     runs-on: ubuntu-latest
@@ -37,12 +41,13 @@ jobs:
             -e GROQ_API_KEY="${{ secrets.GROQ_API_KEY }}" \
             -e GROQ_MODEL="${{ vars.GROQ_MODEL }}" \
             -e GROQ_FALLBACK_MODEL="${{ vars.GROQ_FALLBACK_MODEL }}" \
+            -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
             asmb3456/prscout:latest \
-            sh -c "
+            sh -c '
               apt-get update &&
               apt-get install -y curl &&
               curl -LsSf https://astral.sh/uv/install.sh | sh &&
-              export PATH=\"/root/.local/bin:\$PATH\" &&
+              export PATH="/root/.local/bin:$PATH" &&
               uv sync &&
               uv run app/cli.py --event ./pr.json
-            "
+            '
