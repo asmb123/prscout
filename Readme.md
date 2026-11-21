@@ -1,3 +1,15 @@
+## Run using docker(pre-requisite: Set .env and pr.json):
+
+```
+docker run --rm \
+  -v $(pwd):/workspace \
+  --env GITHUB_TOKEN \
+  --env GROQ_API_KEY \
+  --env GROQ_MODEL \
+  --env GROQ_FALLBACK_MODEL \
+  asmb3456/prscout:latest --event /workspace/pr.json
+```
+
 - Used **GitHub Actions** to trigger a containerized pipeline on every pull_request event, avoiding the need of a server.
 
 - Used **Docker** to sandbox the execution environment, keeping the agent's runtime decoupled from the target code.
