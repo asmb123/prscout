@@ -56,6 +56,34 @@ For GitHub Actions, add `GROQ_API_KEY` as an Actions repository secret. Optional
 model overrides can be configured as repository Actions variables named
 `GROQ_MODEL` and `GROQ_FALLBACK_MODEL`.
 
+## Review identity
+
+GitHub does not allow an Actions job to choose an arbitrary username for a
+review. The review author is the account represented by the token passed to
+PyGithub.
+
+To publish reviews as a dedicated `prscout` bot:
+
+1. Create a separate GitHub account named `prscout` (or another available bot
+   username), enable 2FA, and create a fine-grained personal access token.
+2. Grant that bot account access to every repository that should use PRScout.
+3. Give the token `Contents: Read-only` and `Pull requests: Read and write`.
+4. Add the token as an organization Actions secret named
+   `GITHUB_TOKEN`, or add it separately to each repository.
+5. Ensure the organization allows that secret for the repositories using the
+   workflow.
+
+The workflow prefers `GITHUB_TOKEN` and falls back to the automatic
+`GITHUB_TOKEN` when the bot secret is not configured. Consequently, repositories
+with the bot secret publish reviews as `prscout`; others publish as the
+repository's Actions identity.
+
+Do not use `pull_request_target` merely to expose the bot token to forked
+pull requests. Secrets are intentionally unavailable to fork-triggered
+`pull_request` jobs, so fork reviews remain diff-only and cannot use the bot
+credential. A GitHub App is the recommended next step for large-scale
+installation and credential rotation.
+
 ## Planned hardening:
 
 1. Inline comment positioning — this is one of the hardest/most impressive parts technically (diff-to-line mapping), don't leave it out if you build it:
