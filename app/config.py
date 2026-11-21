@@ -83,7 +83,11 @@ def load_review_config(root: Path) -> ReviewConfig:
 
 
 def github_token() -> str:
-    token = os.getenv("GITHUB_TOKEN") or os.getenv("ACCESS_TOKEN")
+    token = (
+        os.getenv("PRSCOUT_GITHUB_TOKEN")
+        or os.getenv("GITHUB_TOKEN")
+        or os.getenv("ACCESS_TOKEN")
+    )
     if not token:
-        raise ConfigurationError("GITHUB_TOKEN is required")
+        raise ConfigurationError("PRSCOUT_GITHUB_TOKEN or GITHUB_TOKEN is required")
     return token
